@@ -4,8 +4,11 @@
 // </copyright>
 //---------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace Microsoft.OData.Client
 {
+    using Metadata;
     using System;
     using System.Linq;
     using System.Threading;
@@ -34,6 +37,7 @@ namespace Microsoft.OData.Client
         /// <param name="requestUriString">The URI string for this action.</param>
         /// <param name="parameters">Parameters of this action.</param>
         public DataServiceActionQuerySingle(DataServiceContext context, string requestUriString, params BodyOperationParameter[] parameters)
+
         {
             this.context = context;
             this.RequestUri = new Uri(requestUriString);
@@ -93,6 +97,29 @@ namespace Microsoft.OData.Client
         {
             Util.CheckArgumentNull(asyncResult, "asyncResult");
             return context.EndExecute<T>(asyncResult).Single();
+        }
+
+        internal QueryComponents QueryComponents()
+        {
+            List<UriOperationParameter> uriOperationParameters;
+            List<BodyOperationParameter> bodyOperationParameters;
+            bool? singleResult = true;
+            var requestUri = RequestUri;
+            if (ClientTypeUtil.TypeOrElementTypeIsStructured(typeof(T)))
+            {
+                singleResult = null;
+            }
+
+            if (parameters != null && parameters.Length > 0)
+            {
+                DataServiceContext.ValidateOperationParameters(XmlConstants.HttpMethodPost, parameters, out bodyOperationParameters, out uriOperationParameters);
+            }
+            else
+            {
+                uriOperationParameters = null;
+                bodyOperationParameters = null;
+            }
+            return new QueryComponents(requestUri, Util.ODataVersionEmpty, typeof(T), null, null, Util.ExecuteMethodName, singleResult, bodyOperationParameters, uriOperationParameters);
         }
     }
 }

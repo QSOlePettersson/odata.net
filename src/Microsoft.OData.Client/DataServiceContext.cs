@@ -1746,6 +1746,20 @@ namespace Microsoft.OData.Client
             result.BatchBeginRequest();
             return result;
         }
+        
+        /// <summary>Asynchronously submits a group of actions as a batch to the data service.</summary>
+        /// <returns>An <see cref="System.IAsyncResult" /> object that is used to track the status of the asynchronous operation. </returns>
+        /// <param name="callback">The delegate that is called when a response to the batch request is received.</param>
+        /// <param name="state">User-defined state object that is used to pass context data to the callback method.</param>
+        /// <param name="options">A member of the <see cref="Microsoft.OData.Client.SaveChangesOptions" /> enumeration for how the client can save the pending set of changes.</param>
+        /// <param name="actions">The array of action requests to include in the batch request.</param>
+        public virtual IAsyncResult BeginExecuteBatch<T>(AsyncCallback callback, object state, SaveChangesOptions options, DataServiceActionQuerySingle<T>[] actions)
+        {
+            Util.CheckArgumentNotEmpty(actions, "actions");
+            BatchActionResult<T> result = new BatchActionResult<T>(this, "ExecuteBatch", actions, options, callback, state);
+            result.BatchBeginRequest();
+            return result;
+        }
 
         /// <summary>Asynchronously submits a group of queries as a batch to the data service.</summary>
         /// <returns>An Task that represents the DataServiceResult object that indicates the result of the batch operation.</returns>
@@ -1762,6 +1776,15 @@ namespace Microsoft.OData.Client
         public virtual Task<DataServiceResponse> ExecuteBatchAsync(CancellationToken cancellationToken, params DataServiceRequest[] queries)
         {
             return this.ExecuteBatchAsync(SaveChangesOptions.BatchWithSingleChangeset, cancellationToken, queries);
+        }
+
+        /// <summary>Asynchronously submits a group of actions as a batch to the data service.</summary>
+        /// <returns>An Task that represents the DataServiceResult object that indicates the result of the batch operation.</returns>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="actions">The array of action requests to include in the batch request.</param>
+        public virtual Task<DataServiceResponse> ExecuteBatchAsync<T>(CancellationToken cancellationToken, params DataServiceActionQuerySingle<T>[] actions)
+        {
+            return this.ExecuteBatchAsync(SaveChangesOptions.BatchWithSingleChangeset, cancellationToken, actions);
         }
 
         /// <summary>Asynchronously submits a group of queries as a batch to the data service.</summary>
@@ -1791,6 +1814,22 @@ namespace Microsoft.OData.Client
             }
 
             return this.FromAsync((callback, state) => this.BeginExecuteBatch(callback, state, options, queries), this.EndExecuteBatch, cancellationToken);
+        }
+
+        
+        /// <summary>Asynchronously submits a group of actions as a batch to the data service.</summary>
+        /// <returns>An Task that represents the DataServiceResult object that indicates the result of the batch operation.</returns>
+        /// <param name="options">A member of the <see cref="Microsoft.OData.Client.SaveChangesOptions" /> enumeration for how the client can save the pending set of changes.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="actions">The array of action requests to include in the batch request.</param>
+        public virtual Task<DataServiceResponse> ExecuteBatchAsync<T>(SaveChangesOptions options, CancellationToken cancellationToken, params DataServiceActionQuerySingle<T>[] actions)
+        {
+            if (!Util.IsBatch(options))
+            {
+                throw new InvalidOperationException();
+            }
+
+            return this.FromAsync((callback, state) => this.BeginExecuteBatch(callback, state, options, actions), this.EndExecuteBatch, cancellationToken);
         }
 
         /// <summary>Called to complete the <see cref="Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch(System.AsyncCallback,System.Object,Microsoft.OData.Client.DataServiceRequest[])" />.</summary>
@@ -3411,7 +3450,7 @@ namespace Microsoft.OData.Client
         /// <param name="parameters">The list of operation parameters to be validated.</param>
         /// <param name="bodyOperationParameters">The list of body operation parameters to be returned.</param>
         /// <param name="uriOperationParameters">The list of uri operation parameters to be returned.</param>
-        private static void ValidateOperationParameters(
+        internal static void ValidateOperationParameters(
             string httpMethod,
             OperationParameter[] parameters,
             out List<BodyOperationParameter> bodyOperationParameters,
