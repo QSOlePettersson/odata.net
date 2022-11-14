@@ -321,7 +321,7 @@ namespace Microsoft.OData.Client
             // we need to fire request after the headers have been written, but before we write the payload
             batchRequestMessage.FireSendingRequest2(null);
 
-            using (ODataMessageWriter messageWriter = Serializer.CreateMessageWriter(batchRequestMessage, this.RequestInfo, false /*isParameterPayload*/))
+            using (ODataMessageWriter messageWriter = Serializer.CreateMessageWriter(batchRequestMessage, this.RequestInfo, true /*isParameterPayload*/))
             {
                 this.batchWriter = messageWriter.CreateODataBatchWriter();
                 this.batchWriter.WriteStartBatch();
@@ -343,8 +343,8 @@ namespace Microsoft.OData.Client
 
                         this.RequestInfo.Format.SetRequestAcceptHeaderForQuery(headers, queryComponents);
 
-                        ODataRequestMessageWrapper batchOperationRequestMessage = this.CreateRequestMessage(XmlConstants.HttpMethodGet, requestUri, headers, this.RequestInfo.HttpStack, null /*descriptor*/, null /*contentId*/);
-
+                        ODataRequestMessageWrapper batchOperationRequestMessage = this.CreateRequestMessage(XmlConstants.HttpMethodPost, requestUri, headers, this.RequestInfo.HttpStack, null /*descriptor*/, null /*contentId*/);
+                        this.SerializerInstance.WriteBodyOperationParameters(queryComponents.BodyOperationParameters, batchOperationRequestMessage);
                         batchOperationRequestMessage.FireSendingEventHandlers(null /*descriptor*/);
                     }
                 }

@@ -119,7 +119,7 @@ namespace Microsoft.OData.Client
                 uriOperationParameters = null;
                 bodyOperationParameters = null;
             }
-            return new QueryComponents(requestUri, Util.ODataVersionEmpty, typeof(T), null, null, Util.ExecuteMethodName, singleResult, bodyOperationParameters, uriOperationParameters);
+            return new QueryComponents(requestUri, Util.ODataVersionEmpty, typeof(T), null, null, XmlConstants.HttpMethodPost, singleResult, bodyOperationParameters, uriOperationParameters);
         }
     }
 }
