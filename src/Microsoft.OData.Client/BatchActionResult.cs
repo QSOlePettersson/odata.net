@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Xml.Linq;
 using Microsoft.OData.Client.Metadata;
+using Microsoft.OData.Edm;
 
 namespace Microsoft.OData.Client
 {
@@ -328,8 +329,24 @@ namespace Microsoft.OData.Client
 
                 if (this.Queries != null)
                 {
+                    if (Util.IsBatchWithSingleChangeset(this.Options))
+                    {
+                        this.batchWriter.WriteStartChangeset();
+                    }
+
+                    var changeOrder = 1;
                     foreach (var query in this.Queries)
                     {
+                        bool isBatchWithIndependentOperations = Util.IsBatchWithIndependentOperations(this.Options);
+
+                        string changeSetId = null;
+                        if (isBatchWithIndependentOperations)
+                        {
+                            changeSetId = Guid.NewGuid().ToString();
+                            this.batchWriter.WriteStartChangeset(changeSetId);
+                        }
+
+
                         QueryComponents queryComponents = query.QueryComponents();
 
                         Uri requestUri = this.RequestInfo.BaseUriResolver.GetOrCreateAbsoluteUri(queryComponents.Uri);
@@ -343,9 +360,22 @@ namespace Microsoft.OData.Client
 
                         this.RequestInfo.Format.SetRequestAcceptHeaderForQuery(headers, queryComponents);
 
-                        ODataRequestMessageWrapper batchOperationRequestMessage = this.CreateRequestMessage(XmlConstants.HttpMethodPost, requestUri, headers, this.RequestInfo.HttpStack, null /*descriptor*/, null /*contentId*/);
-                        this.SerializerInstance.WriteBodyOperationParameters(queryComponents.BodyOperationParameters, batchOperationRequestMessage);
+                        ODataRequestMessageWrapper batchOperationRequestMessage = this.CreateRequestMessage(XmlConstants.HttpMethodPost, requestUri, headers, this.RequestInfo.HttpStack, null /*descriptor*/, changeOrder.ToString(CultureInfo.InvariantCulture));
                         batchOperationRequestMessage.FireSendingEventHandlers(null /*descriptor*/);
+                        Serializer serializer = new Serializer(RequestInfo, ((DataServiceContext)Source).EntityParameterSendOption);
+                        serializer.WriteBodyOperationParameters(queryComponents.BodyOperationParameters, batchOperationRequestMessage);
+
+                        if (isBatchWithIndependentOperations)
+                        {
+                            this.batchWriter.WriteEndChangeset();
+                        }
+
+                        ++changeOrder;
+                    }
+
+                    if (Util.IsBatchWithSingleChangeset(this.Options))
+                    {
+                        this.batchWriter.WriteEndChangeset();
                     }
                 }
 
@@ -355,6 +385,7 @@ namespace Microsoft.OData.Client
 
             return batchRequestMessage;
         }
+        
 
         /// <summary>
         /// process the batch response

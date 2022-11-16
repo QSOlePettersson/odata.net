@@ -1829,7 +1829,7 @@ namespace Microsoft.OData.Client
                 throw new InvalidOperationException();
             }
 
-            return this.FromAsync((callback, state) => this.BeginExecuteBatch(callback, state, options, actions), this.EndExecuteBatch, cancellationToken);
+            return this.FromAsync((callback, state) => this.BeginExecuteBatch(callback, state, options, actions), this.EndExecuteBatch<T>, cancellationToken);
         }
 
         /// <summary>Called to complete the <see cref="Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch(System.AsyncCallback,System.Object,Microsoft.OData.Client.DataServiceRequest[])" />.</summary>
@@ -1838,6 +1838,15 @@ namespace Microsoft.OData.Client
         public virtual DataServiceResponse EndExecuteBatch(IAsyncResult asyncResult)
         {
             BatchSaveResult result = BaseAsyncResult.EndExecute<BatchSaveResult>(this, "ExecuteBatch", asyncResult);
+            return result.EndRequest();
+        }
+
+        /// <summary>Called to complete the <see cref="Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch(System.AsyncCallback,System.Object,DataServiceActionQuerySingle{T}[])" />.</summary>
+        /// <returns>The DataServiceResult object that indicates the result of the batch operation.</returns>
+        /// <param name="asyncResult">An <see cref="System.IAsyncResult" /> that represents the status of the asynchronous operation.</param>
+        public virtual DataServiceResponse EndExecuteBatch<T>(IAsyncResult asyncResult)
+        {
+            BatchActionResult<T> result = BaseAsyncResult.EndExecute<BatchActionResult<T>>(this, "ExecuteBatch", asyncResult);
             return result.EndRequest();
         }
 
