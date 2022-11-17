@@ -6,11 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using System.Xml.Linq;
-using Microsoft.OData.Client.Metadata;
-using Microsoft.OData.Edm;
 
 namespace Microsoft.OData.Client
 {
@@ -339,10 +335,9 @@ namespace Microsoft.OData.Client
                     {
                         bool isBatchWithIndependentOperations = Util.IsBatchWithIndependentOperations(this.Options);
 
-                        string changeSetId = null;
                         if (isBatchWithIndependentOperations)
                         {
-                            changeSetId = Guid.NewGuid().ToString();
+                            var changeSetId = Guid.NewGuid().ToString();
                             this.batchWriter.WriteStartChangeset(changeSetId);
                         }
 
@@ -539,7 +534,6 @@ namespace Microsoft.OData.Client
                 bool changesetFound = false;
                 bool insideChangeset = false;
                 int queryCount = 0;
-                int operationCount = 0;
                 this.entryIndex = 0;
                 while (batchReader.Read())
                 {
@@ -547,7 +541,7 @@ namespace Microsoft.OData.Client
                     {
                         #region ChangesetStart
                         case ODataBatchReaderState.ChangesetStart:
-                            if ((Util.IsBatchWithSingleChangeset(this.Options) && changesetFound) || (operationCount != 0))
+                            if (Util.IsBatchWithSingleChangeset(this.Options) && changesetFound)
                             {
                                 // Throw if we encounter multiple changesets when running in batch with single changeset mode
                                 // or if we encounter operations outside of a changeset.
@@ -561,7 +555,6 @@ namespace Microsoft.OData.Client
                         #region ChangesetEnd
                         case ODataBatchReaderState.ChangesetEnd:
                             changesetFound = true;
-                            operationCount = 0;
                             insideChangeset = false;
                             break;
                         #endregion
@@ -569,11 +562,9 @@ namespace Microsoft.OData.Client
                         #region Operation
                         case ODataBatchReaderState.Operation:
                             Exception exception = this.ProcessCurrentOperationResponse(batchReader);
-                            if (!insideChangeset)
+                            if (insideChangeset)
                             {
                                 #region Get response
-                                Debug.Assert(operationCount == 0, "missing an EndChangeSet 2");
-
                                 QueryOperationResponse qresponse = null;
                                 try
                                 {
@@ -744,26 +735,7 @@ namespace Microsoft.OData.Client
                 false,
                 out responseVersion);
         }
-
-        /// <summary>
-        /// Validate the content-id.
-        /// </summary>
-        /// <param name="contentIdStr">The contentId read from ChangeSetHead.</param>
-        /// <returns>Returns the correct ChangedEntries index.</returns>
-        private int ValidateContentID(string contentIdStr)
-        {
-            int contentID = 0;
-
-            if (string.IsNullOrEmpty(contentIdStr) ||
-                !Int32.TryParse(contentIdStr, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out contentID))
-            {
-                Error.ThrowBatchUnexpectedContent(InternalError.ChangeResponseMissingContentID);
-            }
-            
-            Error.ThrowBatchUnexpectedContent(InternalError.ChangeResponseUnknownContentID);
-            return -1;
-        }
-
+        
         /// <summary>
         /// Stores information about the currently processed operation response.
         /// </summary>
