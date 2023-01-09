@@ -15,7 +15,12 @@
   </PropertyGroup>
  
   <Import Project="..\Build.props" />
-  
+
+  <PropertyGroup Condition="'$(TreatWarningsAsErrors)' == 'false' or '$(TreatWarningsAsErrors)' == ''">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);RS0017;RS0025</WarningsAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <TextStringResource Include="Microsoft.OData.Core.txt">
       <ResFile>Microsoft.OData.Core</ResFile>
@@ -81,20 +86,6 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Microsoft.OData.Core.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Microsoft.OData.Core.tt</DependentUpon>
-    </Compile>
-
-    <Compile Update="Parameterized.Microsoft.OData.Core.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Parameterized.Microsoft.OData.Core.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces">
       <Version>5.0.0</Version>
@@ -102,5 +93,9 @@
     <PackageReference Include="Microsoft.Extensions.ObjectPool">
       <Version>6.0.3</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI\$(TargetFramework)\**" />
   </ItemGroup>
 </Project>

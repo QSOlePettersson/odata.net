@@ -476,6 +476,15 @@ namespace Microsoft.OData.Client
             internal set { this.applyingChanges = value; }
         }
 
+
+        /// <summary>
+        /// Gets or sets whether query projection will handle null propagation automatically. If set to true null propagation checks can be omitted from queries.
+        ///</summary>
+        /// <remarks>
+        /// Default is false.
+        /// </remarks>
+        public virtual bool AutoNullPropagation { get; set; }
+
         /// <summary>Gets or sets a function to override the default type resolution strategy used by the client library when you send entities to a data service.</summary>
         /// <returns>Returns a string that contains the name of the <see cref="Microsoft.OData.Client.DataServiceContext" />.</returns>
         /// <remarks>
@@ -3327,7 +3336,12 @@ namespace Microsoft.OData.Client
 
                 if (!this.resolveTypesCache.TryGetValue(typeName, out matchedType))
                 {
-                    if (ClientTypeUtil.TryResolveType(typeName, fullNamespace, languageDependentNamespace, out matchedType))
+                    if (ClientTypeUtil.TryResolveType(
+                        this.GetType().GetAssembly(),
+                        typeName,
+                        fullNamespace,
+                        languageDependentNamespace,
+                        out matchedType))
                     {
                         this.resolveTypesCache.TryAdd(typeName, matchedType);
 
