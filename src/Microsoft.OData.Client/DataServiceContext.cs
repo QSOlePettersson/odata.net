@@ -1762,7 +1762,7 @@ namespace Microsoft.OData.Client
         /// <param name="state">User-defined state object that is used to pass context data to the callback method.</param>
         /// <param name="options">A member of the <see cref="Microsoft.OData.Client.SaveChangesOptions" /> enumeration for how the client can save the pending set of changes.</param>
         /// <param name="actions">The array of action requests to include in the batch request.</param>
-        public virtual IAsyncResult BeginExecuteBatch<T>(AsyncCallback callback, object state, SaveChangesOptions options, DataServiceActionQuerySingle<T>[] actions)
+        public virtual IAsyncResult BeginExecuteBatch<T>(AsyncCallback callback, object state, SaveChangesOptions options, params DataServiceActionQuerySingle<T>[] actions)
         {
             Util.CheckArgumentNotEmpty(actions, "actions");
             BatchActionResult<T> result = new BatchActionResult<T>(this, "ExecuteBatch", actions, options, callback, state);
@@ -1850,7 +1850,7 @@ namespace Microsoft.OData.Client
             return result.EndRequest();
         }
 
-        /// <summary>Called to complete the <see cref="Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch(System.AsyncCallback,System.Object,DataServiceActionQuerySingle{T}[])" />.</summary>
+        /// <summary>Called to complete the <see cref="Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch{T}(AsyncCallback,object,SaveChangesOptions,DataServiceActionQuerySingle{T}[])" />.</summary>
         /// <returns>The DataServiceResult object that indicates the result of the batch operation.</returns>
         /// <param name="asyncResult">An <see cref="System.IAsyncResult" /> that represents the status of the asynchronous operation.</param>
         public virtual DataServiceResponse EndExecuteBatch<T>(IAsyncResult asyncResult)

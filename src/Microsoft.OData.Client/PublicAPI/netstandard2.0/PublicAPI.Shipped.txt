@@ -823,6 +823,7 @@ virtual Microsoft.OData.Client.DataServiceContext.BeginExecute<TElement>(System.
 virtual Microsoft.OData.Client.DataServiceContext.BeginExecute<TElement>(System.Uri requestUri, System.AsyncCallback callback, object state, string httpMethod, bool singleResult, params Microsoft.OData.Client.OperationParameter[] operationParameters) -> System.IAsyncResult
 virtual Microsoft.OData.Client.DataServiceContext.BeginExecute<TElement>(System.Uri requestUri, System.AsyncCallback callback, object state, string httpMethod, params Microsoft.OData.Client.OperationParameter[] operationParameters) -> System.IAsyncResult
 virtual Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch(System.AsyncCallback callback, object state, Microsoft.OData.Client.SaveChangesOptions options, params Microsoft.OData.Client.DataServiceRequest[] queries) -> System.IAsyncResult
+virtual Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch<T>(System.AsyncCallback callback, object state, Microsoft.OData.Client.SaveChangesOptions options, params Microsoft.OData.Client.DataServiceActionQuerySingle<T>[] actions) -> System.IAsyncResult
 virtual Microsoft.OData.Client.DataServiceContext.BeginExecuteBatch(System.AsyncCallback callback, object state, params Microsoft.OData.Client.DataServiceRequest[] queries) -> System.IAsyncResult
 virtual Microsoft.OData.Client.DataServiceContext.BeginGetReadStream(object entity, Microsoft.OData.Client.DataServiceRequestArgs args, System.AsyncCallback callback, object state) -> System.IAsyncResult
 virtual Microsoft.OData.Client.DataServiceContext.BeginGetReadStream(object entity, string name, Microsoft.OData.Client.DataServiceRequestArgs args, System.AsyncCallback callback, object state) -> System.IAsyncResult
@@ -857,6 +858,7 @@ virtual Microsoft.OData.Client.DataServiceContext.EnableWritingODataAnnotationWi
 virtual Microsoft.OData.Client.DataServiceContext.EndExecute(System.IAsyncResult asyncResult) -> Microsoft.OData.Client.OperationResponse
 virtual Microsoft.OData.Client.DataServiceContext.EndExecute<TElement>(System.IAsyncResult asyncResult) -> System.Collections.Generic.IEnumerable<TElement>
 virtual Microsoft.OData.Client.DataServiceContext.EndExecuteBatch(System.IAsyncResult asyncResult) -> Microsoft.OData.Client.DataServiceResponse
+virtual Microsoft.OData.Client.DataServiceContext.EndExecuteBatch<T>(System.IAsyncResult asyncResult) -> Microsoft.OData.Client.DataServiceResponse
 virtual Microsoft.OData.Client.DataServiceContext.EndGetReadStream(System.IAsyncResult asyncResult) -> Microsoft.OData.Client.DataServiceStreamResponse
 virtual Microsoft.OData.Client.DataServiceContext.EndLoadProperty(System.IAsyncResult asyncResult) -> Microsoft.OData.Client.QueryOperationResponse
 virtual Microsoft.OData.Client.DataServiceContext.EndSaveChanges(System.IAsyncResult asyncResult) -> Microsoft.OData.Client.DataServiceResponse
@@ -884,8 +886,10 @@ virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatch(Microsoft.OData.C
 virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatch(params Microsoft.OData.Client.DataServiceRequest[] queries) -> Microsoft.OData.Client.DataServiceResponse
 virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatchAsync(Microsoft.OData.Client.SaveChangesOptions options, params Microsoft.OData.Client.DataServiceRequest[] queries) -> System.Threading.Tasks.Task<Microsoft.OData.Client.DataServiceResponse>
 virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatchAsync(Microsoft.OData.Client.SaveChangesOptions options, System.Threading.CancellationToken cancellationToken, params Microsoft.OData.Client.DataServiceRequest[] queries) -> System.Threading.Tasks.Task<Microsoft.OData.Client.DataServiceResponse>
+virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatchAsync<T>(Microsoft.OData.Client.SaveChangesOptions options, System.Threading.CancellationToken cancellationToken, params Microsoft.OData.Client.DataServiceActionQuerySingle<T>[] actions) -> System.Threading.Tasks.Task<Microsoft.OData.Client.DataServiceResponse>
 virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatchAsync(params Microsoft.OData.Client.DataServiceRequest[] queries) -> System.Threading.Tasks.Task<Microsoft.OData.Client.DataServiceResponse>
 virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatchAsync(System.Threading.CancellationToken cancellationToken, params Microsoft.OData.Client.DataServiceRequest[] queries) -> System.Threading.Tasks.Task<Microsoft.OData.Client.DataServiceResponse>
+virtual Microsoft.OData.Client.DataServiceContext.ExecuteBatchAsync<T>(System.Threading.CancellationToken cancellationToken, params Microsoft.OData.Client.DataServiceActionQuerySingle<T>[] actions) -> System.Threading.Tasks.Task<Microsoft.OData.Client.DataServiceResponse>
 virtual Microsoft.OData.Client.DataServiceContext.Format.get -> Microsoft.OData.Client.DataServiceClientFormat
 virtual Microsoft.OData.Client.DataServiceContext.GetEntityDescriptor(object entity) -> Microsoft.OData.Client.EntityDescriptor
 virtual Microsoft.OData.Client.DataServiceContext.GetLinkDescriptor(object source, string sourceProperty, object target) -> Microsoft.OData.Client.LinkDescriptor
