@@ -468,9 +468,14 @@ namespace Microsoft.OData.Client
 
         private static HttpWebResponseMessage ConvertHttpWebResponse(HttpResponseMessage response)
         {
-            IEnumerable<KeyValuePair<string, string>> allHeaders = HttpHeadersToStringDictionary(response.Headers).Concat(HttpHeadersToStringDictionary(response.Content.Headers));
+            var allHeaders = HttpHeadersToStringDictionary(response.Headers);
+            foreach (var header in HttpHeadersToStringDictionary(response.Content.Headers))
+            {
+                if (allHeaders.ContainsKey(header.Key)) continue;
+                allHeaders.Add(header.Key, header.Value);
+            }
             return new HttpWebResponseMessage(
-                allHeaders.ToDictionary((h1) => h1.Key, (h2) => h2.Value),
+                allHeaders,
                 (int)response.StatusCode,
                 () =>
                 {
